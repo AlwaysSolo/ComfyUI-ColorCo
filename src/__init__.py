@@ -1527,7 +1527,7 @@ class EasyColorCorrection:
                         "tooltip": "Tint adjustment: -1.0 = green, +1.0 = magenta (Manual mode only)",
                     },
                 ),
-                "preset": (list(cls.PRESETS.keys()), {}),
+                "preset": (list(cls.PRESETS.keys()), {"default": "Natural Portrait"}),
                 "variation": (
                     "FLOAT",
                     {
@@ -1763,6 +1763,43 @@ class EasyColorCorrection:
         use_gpu: bool = True,
         mask: typing.Optional[torch.Tensor] = None,
     ) -> tuple:
+        # Validate and sanitize numeric parameters - handle None, [], and invalid types
+        def safe_float(value, default=0.0):
+            """Convert value to float, returning default if invalid."""
+            if value is None or value == [] or value == "":
+                return default
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        # Sanitize all float parameters
+        reference_strength = safe_float(reference_strength, 0.3)
+        white_balance_strength = safe_float(white_balance_strength, 0.0)
+        enhancement_strength = safe_float(enhancement_strength, 0.2)
+        pop_factor = safe_float(pop_factor, 0.7)
+        effect_strength = safe_float(effect_strength, 0.6)
+        warmth = safe_float(warmth, 0.0)
+        vibrancy = safe_float(vibrancy, 0.0)
+        contrast = safe_float(contrast, 0.0)
+        brightness = safe_float(brightness, 0.0)
+        tint = safe_float(tint, 0.0)
+        variation = safe_float(variation, 0.0)
+        lift = safe_float(lift, 0.0)
+        gamma = safe_float(gamma, 0.0)
+        gain = safe_float(gain, 0.0)
+        noise = safe_float(noise, 0.0)
+        skin_tone_adjustment = safe_float(skin_tone_adjustment, 0.0)
+        sky_adjustment = safe_float(sky_adjustment, 0.0)
+        foliage_adjustment = safe_float(foliage_adjustment, 0.0)
+        selective_hue_shift = safe_float(selective_hue_shift, 0.0)
+        selective_saturation = safe_float(selective_saturation, 0.0)
+        selective_strength = safe_float(selective_strength, 1.0)
+        colorize_strength = safe_float(colorize_strength, 0.8)
+        skin_warmth = safe_float(skin_warmth, 0.3)
+        sky_saturation = safe_float(sky_saturation, 0.6)
+        vegetation_green = safe_float(vegetation_green, 0.5)
+        sepia_tone = safe_float(sepia_tone, 0.0)
 
         original_image = image.clone()
         _, height, width, _ = image.shape
@@ -2806,6 +2843,30 @@ class BatchColorCorrection:
         GPU-optimized batch processing for video frame sequences.
         Processes multiple frames efficiently while keeping tensors on GPU.
         """
+        # Validate and sanitize numeric parameters - handle None, [], and invalid types
+        def safe_float(value, default=0.0):
+            """Convert value to float, returning default if invalid."""
+            if value is None or value == [] or value == "":
+                return default
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        # Sanitize all float parameters
+        effect_strength = safe_float(effect_strength, 0.4)
+        enhancement_strength = safe_float(enhancement_strength, 0.8)
+        white_balance_strength = safe_float(white_balance_strength, 0.6)
+        warmth = safe_float(warmth, 0.0)
+        vibrancy = safe_float(vibrancy, 0.0)
+        brightness = safe_float(brightness, 0.0)
+        contrast = safe_float(contrast, 0.0)
+        tint = safe_float(tint, 0.0)
+        lift = safe_float(lift, 0.0)
+        gamma = safe_float(gamma, 0.0)
+        gain = safe_float(gain, 0.0)
+        noise = safe_float(noise, 0.0)
+        reference_strength = safe_float(reference_strength, 0.5)
 
         # Get batch dimensions and device
         total_frames = images.shape[0]
