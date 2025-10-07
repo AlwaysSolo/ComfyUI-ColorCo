@@ -1766,7 +1766,7 @@ class EasyColorCorrection:
         # Validate and sanitize numeric parameters - handle None, [], and invalid types
         def safe_float(value, default=0.0):
             """Convert value to float, returning default if invalid."""
-            if value is None or value == [] or value == "":
+            if value is None or value == "" or (isinstance(value, list) and len(value) == 0):
                 return default
             try:
                 return float(value)
@@ -2846,7 +2846,7 @@ class BatchColorCorrection:
         # Validate and sanitize numeric parameters - handle None, [], and invalid types
         def safe_float(value, default=0.0):
             """Convert value to float, returning default if invalid."""
-            if value is None or value == [] or value == "":
+            if value is None or value == "" or (isinstance(value, list) and len(value) == 0):
                 return default
             try:
                 return float(value)
@@ -3635,6 +3635,25 @@ class RawImageProcessor:
         """
         Process advanced image formats (RAW, EXR, HDR, TIFF 16-bit) with professional controls.
         """
+        # Validate numeric parameters
+        def safe_float(value, default=0.0):
+            if value is None or value == "" or (isinstance(value, list) and len(value) == 0):
+                return default
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        hdr_exposure = safe_float(hdr_exposure, 0.0)
+        hdr_gamma = safe_float(hdr_gamma, 2.2)
+        exposure = safe_float(exposure, 0.0)
+        highlights = safe_float(highlights, 0.0)
+        shadows = safe_float(shadows, 0.0)
+        brightness = safe_float(brightness, 0.0)
+        contrast = safe_float(contrast, 0.0)
+        saturation = safe_float(saturation, 0.0)
+        noise_reduction = safe_float(noise_reduction, 0.0)
+
         if not file_path or not file_path.strip():
             raise ValueError("File path is required")
 
@@ -4452,10 +4471,24 @@ class FilmEmulation:
     CATEGORY = "itsjustregi / Easy Color Corrector"
     DISPLAY_NAME = "Film Emulation"
 
-    def apply_film_emulation(self, image, film_stock, strength=1.0, grain_intensity=0.3, 
+    def apply_film_emulation(self, image, film_stock, strength=1.0, grain_intensity=0.3,
                            exposure_compensation=0.0, push_pull=0.0, highlight_rolloff=0.8):
         """Apply film stock emulation to the input image."""
-        
+        # Validate numeric parameters
+        def safe_float(value, default=0.0):
+            if value is None or value == "" or (isinstance(value, list) and len(value) == 0):
+                return default
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        strength = safe_float(strength, 1.0)
+        grain_intensity = safe_float(grain_intensity, 0.3)
+        exposure_compensation = safe_float(exposure_compensation, 0.0)
+        push_pull = safe_float(push_pull, 0.0)
+        highlight_rolloff = safe_float(highlight_rolloff, 0.8)
+
         original_image = image.clone()
         processed_image = image.clone()
         

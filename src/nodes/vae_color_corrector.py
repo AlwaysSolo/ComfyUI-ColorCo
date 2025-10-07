@@ -82,6 +82,28 @@ class VAEColorCorrector:
         """
         Correct VAE-induced color shifts by referencing the original image.
         """
+        # Validate and sanitize numeric parameters
+        def safe_float(value, default):
+            """Convert value to float, returning default if invalid."""
+            if value is None or value == "" or (isinstance(value, list) and len(value) == 0):
+                return default
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        def safe_int(value, default):
+            """Convert value to int, returning default if invalid."""
+            if value is None or value == "" or (isinstance(value, list) and len(value) == 0):
+                return default
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return default
+
+        correction_strength = safe_float(correction_strength, 0.8)
+        edge_feather = safe_int(edge_feather, 5)
+
         device = original_image.device
         
         print(f"🔧 VAE Color Correction: method={method}, strength={correction_strength:.2f}")
